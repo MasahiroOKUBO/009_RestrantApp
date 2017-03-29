@@ -6,10 +6,9 @@
     </div>
     <div class="col-md-6 text-right">
         {% if 'username' not in session %}
-            <a href="{{ url_for('Login') }}">Click Here to Login </a>
+            <a href="{{ url_for('Login') }}">Login</a>
         {% else %}
-            <a href="{{ url_for('disconnect') }}">Logout </a>
+            <a href="{{ url_for('Logout') }}">Logout</a>
         {% endif %}
-
     </div>
 </div>
