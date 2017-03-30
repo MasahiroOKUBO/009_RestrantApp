@@ -1,7 +1,7 @@
 import httplib2
 import json
 from flask import render_template, request, flash
-from flask import session as login_session
+from flask import session as flask_session
 from flask import make_response
 from RestaurantApp.models import User
 from RestaurantApp.utility import db_session
@@ -33,22 +33,22 @@ def getUserID(email):
 
 @app.route('/login_with_facebook', methods=['POST'])
 def LoginWithFacebook():
-    print request.args.get('state')
-    print login_session['state']
-    if request.args.get('state') != login_session['state']:
+    if request.args.get('state') != flask_session['state']:
         response = make_response(json.dumps('Invalid state parameter.'), 401)
         response.headers['Content-Type'] = 'application/json'
         return response
+    print request.args.get('state')
+    print flask_session['state']
     '''
     ================
        read client_secret_facebook.json
     ================
     '''
     json_content = json.loads(open('client_secret_facebook.json', 'r').read())
-    print "json_content : %s" % json_content
     app_id = json_content['web']['app_id']
     app_secret = json_content['web']['app_secret']
     access_token = request.data
+    print "json_content : %s" % json_content
     print "app_id : %s" % app_id
     print "app_secret : %s" % app_secret
     print "access_token : %s" % access_token
@@ -62,14 +62,13 @@ def LoginWithFacebook():
           '&client_id=%s' \
           '&client_secret=%s' \
           '&fb_exchange_token=%s' % (app_id, app_secret, access_token)
-    print "url : %s" % url
     h = httplib2.Http()
     result = h.request(url, 'GET')[1]
-    print "result : %s" % result
     data = json.loads(result)
     token = 'access_token=' + data['access_token']
-    # token = result.split("&")[0]
     stored_token = token.split("=")[1]
+    print "url : %s" % url
+    print "result : %s" % result
     print "token : %s" % token
     print "stored_token : %s" % stored_token
 
@@ -81,22 +80,22 @@ def LoginWithFacebook():
     url = 'https://graph.facebook.com/v2.8/me' \
           '?%s' \
           '&fields=name,id,email' % token
-    print "url : %s" % url
     h = httplib2.Http()
     result = h.request(url, 'GET')[1]
     json_content = json.loads(result)
-    login_session['provider'] = 'facebook'
-    login_session['username'] = json_content["name"]
-    login_session['email'] = json_content["email"]
-    login_session['facebook_id'] = json_content["id"]
-    login_session['access_token'] = stored_token
+    flask_session['provider'] = 'facebook'
+    flask_session['username'] = json_content["name"]
+    flask_session['email'] = json_content["email"]
+    flask_session['facebook_id'] = json_content["id"]
+    flask_session['access_token'] = stored_token
+    print "url : %s" % url
     print "result : %s" % result
     print "json_content : %s" % json_content
-    print "provider : %s" % login_session['provider']
-    print "username : %s" % login_session['username']
-    print "email : %s" % login_session['email']
-    print "facebook_id : %s" % login_session['facebook_id']
-    print "access_token : %s" % login_session['access_token']
+    print "provider : %s" % flask_session['provider']
+    print "username : %s" % flask_session['username']
+    print "email : %s" % flask_session['email']
+    print "facebook_id : %s" % flask_session['facebook_id']
+    print "access_token : %s" % flask_session['access_token']
 
     '''
     ================
@@ -112,27 +111,28 @@ def LoginWithFacebook():
     result = h.request(url, 'GET')[1]
     json_content = json.loads(result)
     picture_url = json_content["data"]["url"]
-    login_session['picture'] = picture_url
-    print "picture : %s" % login_session['picture']
+    flask_session['picture'] = picture_url
+    print "picture : %s" % flask_session['picture']
     '''
     ================
        if email not registerd, create new user.
     ================
     '''
-    user_id = getUserID(login_session['email'])
+    user_id = getUserID(flask_session['email'])
     print "user_id : %s" % user_id
     if not user_id:
-        user_id = createUser(login_session)
+        user_id = createUser(flask_session)
         print "Create New User !"
-    login_session['user_id'] = user_id
+    flask_session['user_id'] = user_id
+    print "user_id : %s" % user_id
 
     '''
     ================
        render login confirm page
     ================
     '''
-    print "login_session : %s" % login_session
-    flash("Now logged in as %s" % login_session['username'])
+    print "login_session : %s" % flask_session
+    flash("Now logged in as %s" % flask_session['username'])
     return render_template('page_login_confirm.html',
-                           username=login_session['username'],
-                           picture=login_session['picture'])
+                           username=flask_session['username'],
+                           picture=flask_session['picture'])

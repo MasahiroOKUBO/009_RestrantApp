@@ -24,3 +24,5 @@ from views import DeleteMenu
 from views import JsonAllRestaurants
 from views import JsonAllMenus
 from views import JsonOneMenu
+
+from views import ShowCustom404

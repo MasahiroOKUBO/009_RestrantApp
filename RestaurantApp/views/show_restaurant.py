@@ -4,7 +4,6 @@ from RestaurantApp.models import User
 from RestaurantApp.models import Restaurant
 from RestaurantApp.models import Menu
 from RestaurantApp.utility import db_session
-from RestaurantApp.utility import GetUserObj
 from RestaurantApp import app
 
 

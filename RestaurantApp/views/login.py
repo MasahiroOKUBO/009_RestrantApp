@@ -1,7 +1,7 @@
 import random
 import string
 from flask import render_template
-from flask import session as login_session
+from flask import session as flask_session
 from RestaurantApp.utility import GOOGLE_CLIENT_ID
 from RestaurantApp.utility import FACEBOOK_APP_ID
 from RestaurantApp import app
@@ -13,7 +13,7 @@ def Login():
     state = ''
     for i in range(32):
         state += state.join(random.choice(string.ascii_uppercase + string.digits))
-    login_session['state'] = state
+    flask_session['state'] = state
     print "print state " + state
     return render_template('page_login.html',
                            STATE=state,

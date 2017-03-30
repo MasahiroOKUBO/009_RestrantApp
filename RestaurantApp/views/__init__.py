@@ -15,3 +15,4 @@ from delete_menu import DeleteMenu
 from json_all_restaurants import JsonAllRestaurants
 from json_all_menus import JsonAllMenus
 from json_one_menu import JsonOneMenu
+from show_custom_404 import ShowCustom404
